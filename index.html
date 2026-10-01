@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="color-scheme" content="light">
+<meta name="apple-mobile-web-app-title" content="Mitarbeit">
+<meta name="robots" content="noindex, nofollow">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Mitarbeit</title>
+<style>
+:root{--bg:#f8fafc;--card:#fff;--fg:#1e293b;--mut:#64748b;--line:#cbd5e1;--line2:#f1f5f9;--chip:#f8fafc;--chiph:#f1f5f9;
+--acc:#334155;--acch:#1e293b;--acct:#f1f5f9;--green:#5FAB14;--greenh:#4c8a10;--accfg:#fff;
+--warn:#fff7e0;--warnb:#e0a800;--bad:#fdecec;--badb:#c0392b;--shadow:0 8px 20px rgba(15,23,42,.06);--r:14px;--rs:10px}
+body[data-subj=ma]{--acc:#c0453b;--acch:#9d372f;--acct:#fbeceb}
+body[data-subj=en]{--acc:#467ebb;--acch:#39679b;--acct:#e9f1fa}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:17px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+#app{max-width:960px;margin:calc(20px + env(safe-area-inset-top)) auto calc(110px + env(safe-area-inset-bottom));background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:28px 32px;border-top:6px solid var(--acc)}
+@media (max-width:700px){#app{margin:10px 8px 110px;padding:18px 16px}}
+header{display:flex;align-items:center;gap:12px;margin:0 0 22px}
+header h1{font-size:1.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin:0;flex:1}
+header h1 small{text-transform:none;letter-spacing:0;color:var(--acc);font-weight:700}
+.back{background:none;border:0;color:var(--acc);font-size:17px;font-weight:700;padding:8px 4px;cursor:pointer}
+h2{font-size:1.05rem;font-weight:800;text-transform:uppercase;letter-spacing:.04em;margin:28px 0 12px}
+.muted{color:var(--mut)}
+small{display:block;color:var(--mut);font-size:13px}
+button{font:inherit;color:inherit;touch-action:manipulation;user-select:none;-webkit-user-select:none}
+button:active{transform:scale(.97)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:50px;padding:12px 22px;border-radius:var(--rs);border:1px solid var(--line);background:var(--chip);cursor:pointer;font-weight:700;transition:all .15s ease}
+.btn:hover{background:var(--chiph);border-color:var(--acch);color:var(--acch)}
+.btn.primary{background:var(--acc);color:var(--accfg);border-color:var(--acc)}
+.btn.primary:hover{background:var(--acch);border-color:var(--acch);color:#fff}
+.btn.go{background:var(--green);border-color:var(--green);color:#fff}
+.btn.go:hover{background:var(--greenh);border-color:var(--greenh);color:#fff}
+.btn.big{width:100%;min-height:72px;font-size:1.3rem;text-transform:uppercase;letter-spacing:.04em}
+.btn.danger{color:var(--badb)}
+.btn.sm{min-height:42px;padding:8px 14px;font-size:15px}
+.btnrow{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.btnrow .btn{flex:1}
+.list{display:grid;gap:10px;margin-bottom:14px}
+.card{display:block;width:100%;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:var(--rs);padding:14px 16px;cursor:pointer;transition:all .15s ease}
+button.card:hover{border-color:var(--acc)}
+.card.subj-ma{border-left:6px solid #c0453b}.card.subj-en{border-left:6px solid #467ebb}
+.ct{font-size:1.25rem;font-weight:800}
+.banner{background:var(--warn);border:1px solid var(--warnb);border-radius:var(--rs);padding:12px 14px;margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.banner span{flex:1;min-width:200px}
+.panel{background:var(--card);border:1.5px solid var(--line);border-radius:var(--rs);padding:14px 16px;margin:12px 0}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;margin:16px 0}
+.chip{min-height:68px;border-radius:var(--rs);border:1.5px solid var(--line);background:var(--chip);font-size:1.35rem;font-weight:500;cursor:pointer;padding:6px;transition:all .12s ease}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff;font-weight:800}
+.chip.on small{color:#fff}
+.chip.dis{opacity:.35}
+.chip small{font-weight:500;font-size:12px}
+.chip.hasnote{border-style:dashed;border-color:var(--acc)}
+.wtitle{font-size:1.6rem;font-weight:800;text-transform:uppercase;letter-spacing:.03em;margin:8px 0 4px}
+.wsub{color:var(--mut);margin:0 0 6px}
+.wnav{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);box-shadow:0 -6px 20px rgba(15,23,42,.06);padding:10px 16px calc(10px + env(safe-area-inset-bottom));display:flex;gap:12px;align-items:center;justify-content:center;z-index:5}
+.wnav .btn{min-width:150px;min-height:56px;font-size:1.1rem}
+.wnav .cnt{color:var(--mut);min-width:60px;text-align:center;font-weight:700}
+.prog{height:6px;background:var(--line2);border-radius:3px;overflow:hidden;margin-bottom:12px}
+.prog i{display:block;height:100%;background:var(--acc)}
+.rows{display:grid;gap:10px;margin:16px 0}
+.qrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap;background:var(--card);border:1.5px solid var(--line);border-radius:var(--rs);padding:10px 12px}
+.qc{font-size:1.35rem;font-weight:800;min-width:90px}
+.seg{display:flex;border:1.5px solid var(--line);border-radius:var(--rs);overflow:hidden;flex:1;min-width:250px}
+.seg button{flex:1;min-height:52px;border:0;background:var(--chip);cursor:pointer;font-size:16px;font-weight:600;border-left:1px solid var(--line)}
+.seg button:first-child{border-left:0}
+.seg button.on{background:var(--acc);color:#fff;font-weight:800}
+.toggle{width:100%;min-height:56px;border-radius:var(--rs);border:1.5px solid var(--line);background:var(--chip);font-size:1.1rem;font-weight:700;margin:12px 0 0;cursor:pointer}
+.toggle.on{background:var(--acct);border-color:var(--acc);color:var(--acch)}
+input[type=text],input[type=date],textarea{font:inherit;color:inherit;background:var(--card);border:1.5px solid var(--line);border-radius:var(--rs);padding:10px 12px;width:100%}
+input:focus,textarea:focus{outline:none;border-color:var(--acc)}
+textarea{min-height:90px}
+label.row{display:flex;gap:12px;align-items:center;margin:10px 0;font-weight:700}
+label.row input{flex:1}
+.srow{display:flex;gap:8px;align-items:center;margin:6px 0}
+.srow .nr{width:28px;color:var(--mut);text-align:right}
+.srow input{flex:1}
+.srow button{min-width:48px;min-height:46px;border-radius:var(--rs);border:1px solid var(--line);background:var(--chip);cursor:pointer}
+.sum dt{font-weight:800;margin-top:10px;color:var(--acc)}
+.sum dd{margin:2px 0 0}
+.tw{overflow-x:auto;border:1.5px solid var(--line);border-radius:var(--rs)}
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:15px}
+th,td{padding:10px;border-bottom:1px solid var(--line2);text-align:center;white-space:nowrap}
+th{font-size:12px;color:var(--fg);font-weight:800;text-transform:uppercase;letter-spacing:.04em;background:var(--chip);border-bottom:2px solid var(--line)}
+td:first-child,th:first-child{text-align:left;position:sticky;left:0;background:var(--card)}
+th:first-child{background:var(--chip)}
+tr:last-child td{border-bottom:0}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--acct)}
+td b{font-size:17px;color:var(--acc)}
+td:first-child b{color:var(--fg)}
+td small{font-size:11px}
+tr.never td:first-child{box-shadow:inset 4px 0 var(--badb)}
+.tag{display:inline-block;padding:2px 8px;border-radius:8px;font-size:13px;font-weight:700}
+.tag.bad{background:var(--bad);color:var(--badb)}
+.lv{display:flex;gap:10px;padding:7px 10px;border-radius:8px}
+.lv.hit{background:var(--acct);outline:2px solid var(--acc)}
+.lv .p{min-width:44px;font-weight:800;color:var(--acc)}
+.hist{font-size:15px}
+.hist div{padding:7px 0;border-bottom:1px solid var(--line2)}
+.hist div:last-child{border-bottom:0}
+svg.sym{width:.8em;height:.8em;margin-right:.3em;vertical-align:baseline;opacity:.75}
+.chip.on svg.sym{opacity:1}
+.gbtn svg.sym{width:20px;height:20px;margin:0;opacity:1}
+.gsep{border:0;border-top:1.5px dashed var(--line);margin:4px 0}
+#toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 18px;border-radius:var(--rs);opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:90vw;font-weight:600}
+#toast.show{opacity:1}
+#toast.err{background:#b42318}
+.filter{display:flex;gap:10px;flex-wrap:wrap;align-items:center;font-weight:700}
+.filter input{width:auto;flex:1;min-width:150px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="toast"></div>
+<input type="file" id="importFile" accept=".json,application/json" style="display:none">
+<script>
+'use strict';
+/* =========================================================
+   Mündliche Mitarbeit – alle Daten liegen NUR lokal im
+   Browser-Speicher dieses Geräts. Im Code stehen keine Daten.
+   ========================================================= */
+const KEY='mitarbeit_v1';
+
+const RASTER={
+ ma:{name:'Mathematik',crit:[
+  {k:'quant',t:'Quantität der Beiträge',s:'Quant.',max:4,step:1,lv:[[4,'4','beteiligt sich konstant'],[3,'3','beteiligt sich häufig'],[2,'2','beteiligt sich gelegentlich'],[1,'1','beteiligt sich selten'],[0,'0','beteiligt sich sehr selten bis nie']]},
+  {k:'qual',t:'Qualität der Beiträge',s:'Qual.',max:4,step:1,lv:[[4,'4','sehr gute Beiträge (durchgehend selbstständig, den Unterricht bereichernd, strukturiert und sinnvolle Fragen aufwerfend, nahezu fehlerfrei)'],[3,'3','gute Beiträge (sehr oft selbstständig, produktiv, logische Gedankenführung, kritisch, wenige Fehler)'],[2,'2','befriedigende Beiträge (oft selbstständig, meist produktiv, ansatzweise kritisch und kaum Fehler)'],[1,'1','ausreichende bis mangelhafte Beiträge (nur teilweise selbstständig, viel reproduzierend, Hilfe ist nötig, oft Fehler)'],[0,'0','kaum bis keine Beiträge']]},
+  {k:'komm',t:'Kommunikative Kompetenzen',s:'Komm.',max:3,step:0.5,d:'führt den Unterricht, differenziert fremde Beiträge, greift Grundgedanken auf und vertieft sie, stellt weiterführende Fragen, verknüpft die eigene Meinung mit anderen, greift Schülerimpulse auf',lv:[[3,'3','zeigt konstant und durchgehend die Kompetenzen'],[2.5,'2,5','zeigt häufig (die meisten) der Kompetenzen'],[2,'2','zeigt häufig einige der Kompetenzen'],[1.5,'1,5','zeigt gelegentlich einige wenige der Kompetenzen'],[1,'1','zeigt die Kompetenzen kaum'],[0,'0','zeigt keine der Kompetenzen']]},
+  {k:'arbeit',t:'Arbeitsbereitschaft',s:'Arbeit',max:4,step:1,lv:[[4,'4','arbeitet konzentriert und diszipliniert, Hausaufgaben werden konstant erledigt'],[3,'3','arbeitet überwiegend konzentriert und diszipliniert, ist meist bei der Sache, Hausaufgaben werden häufig erledigt'],[2,'2','arbeitet gelegentlich konzentriert und diszipliniert, ist meist bei der Sache, Hausaufgaben gelegentlich erledigt'],[1,'1','arbeitet manchmal konzentriert und diszipliniert, ist aber auch häufig abgelenkt, Hausaufgaben werden selten erledigt'],[0,'0','ist nur selten konzentriert und diszipliniert, ist meist abgelenkt, Hausaufgaben werden sehr selten bis nie erledigt']]}
+ ]},
+ en:{name:'Englisch',crit:[
+  {k:'quant',t:'Quantität der Beiträge',s:'Quant.',max:8,step:1,lv:[[7,'7–8','beteiligt sich konstant'],[5,'5–6','beteiligt sich häufig'],[3,'3–4','beteiligt sich gelegentlich'],[1,'1–2','beteiligt sich selten'],[0,'0','beteiligt sich sehr selten bis nie']]},
+  {k:'qual',t:'Qualität der Beiträge',s:'Qual.',max:8,step:1,lv:[[8,'8','sehr gute Beiträge (durchgehend selbstständig, den Unterricht bereichernd, strukturiert und sinnvolle Fragen aufwerfend, nahezu fehlerfrei)'],[6,'6–7','gute Beiträge (sehr oft selbstständig, produktiv, logische Gedankenführung, kritisch, wenige Fehler)'],[4,'4–5','befriedigende Beiträge (oft selbstständig, meist produktiv, ansatzweise kritisch und kaum Fehler)'],[2,'2–3','ausreichende Beiträge (nur teilweise selbstständig, Hilfe ist nötig, einige Fehler)'],[1,'1','mangelhafte Beiträge (viel reproduzierend, oft ist Hilfe nötig, vermehrt Fehler)'],[0,'0','kaum bis keine Beiträge']]},
+  {k:'lang',t:'Einsprachigkeit',s:'Sprache',max:6,step:1,lv:[[5,'5–6','spricht sehr häufig Englisch'],[3,'3–4','spricht häufig Englisch'],[1,'1–2','spricht gelegentlich Englisch'],[0,'0','spricht sehr selten bis nie Englisch']]},
+  {k:'arbeit',t:'Arbeitsweise in den Arbeitsphasen',s:'Arbeit',max:5,step:1,lv:[[5,'5','arbeitet konzentriert und diszipliniert, in angemessenem Tempo'],[3,'3–4','arbeitet überwiegend konzentriert und diszipliniert, ist meist bei der Sache'],[1,'1–2','arbeitet manchmal konzentriert und diszipliniert, ist aber auch häufig abgelenkt'],[0,'0','ist nur selten konzentriert und diszipliniert, ist meist abgelenkt']]}
+ ]}
+};
+
+/* ---------- Helfer ---------- */
+const app=document.getElementById('app');
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad=n=>String(n).padStart(2,'0');
+const today=()=>{const d=new Date();return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());};
+function fmtDate(iso){if(!iso)return'';const[y,m,d]=iso.split('-');const wd=['So','Mo','Di','Mi','Do','Fr','Sa'][new Date(+y,m-1,+d).getDay()];return wd+', '+d+'.'+m+'.'+y;}
+const nf=(x,d=1)=>Number(x).toLocaleString('de-DE',{minimumFractionDigits:d,maximumFractionDigits:d});
+const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+
+function load(){try{const d=JSON.parse(localStorage.getItem(KEY));if(d&&Array.isArray(d.classes))return d;}catch(e){}return{version:1,classes:[],lastBackup:null};}
+let db=load();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(db));return true;}catch(e){toast('Speichern fehlgeschlagen!',true);return false;}}
+if(navigator.storage&&navigator.storage.persist){navigator.storage.persist().catch(()=>{});}
+
+const cls=id=>db.classes.find(c=>c.id===id);
+const code=(c,id)=>{const s=c.students.find(x=>x.id===id);return s?s.code:'?';};
+const SYM={f:'<svg class="sym" viewBox="0 0 14 14" aria-label="weiblich"><circle cx="7" cy="7" r="6" fill="currentColor"/></svg>',m:'<svg class="sym" viewBox="0 0 14 14" aria-label="männlich"><polygon points="0.5,1.5 13.5,1.5 7,13.5" fill="currentColor"/></svg>'};
+const gOf=(c,id)=>{const s=c.students.find(x=>x.id===id);return s&&s.g||'';};
+const GORD={f:0,m:1,'':2};
+const activeS=c=>c.students.filter(s=>s.active!==false);
+const codes=(c,ids)=>ids.length?ids.map(id=>esc(code(c,id))).join(', '):'–';
+
+let toastT;
+function toast(msg,err){const t=document.getElementById('toast');t.textContent=msg;t.className='show'+(err?' err':'');clearTimeout(toastT);toastT=setTimeout(()=>t.className='',2600);}
+
+let S={view:'home',cid:null,sid:null,w:null,edit:null,pid:null,np:null};
+function go(v,o){Object.assign(S,o||{});S.view=v;render();window.scrollTo(0,0);}
+
+const hdr=(t,back)=>'<header>'+(back?'<button class="back" data-act="'+back+'">‹ Zurück</button>':'')+'<h1>'+t+'</h1></header>';
+
+/* ---------- Backup ---------- */
+function backupAge(){if(!db.lastBackup)return Infinity;return(Date.now()-new Date(db.lastBackup).getTime())/864e5;}
+function hasData(){return db.classes.some(c=>c.lessons.length);}
+function backupBanner(){
+ if(!hasData()||backupAge()<7)return'';
+ const t=db.lastBackup?'Letztes Backup vor '+Math.floor(backupAge())+' Tagen.':'Noch kein Backup erstellt.';
+ return '<div class="banner"><span>⚠️ '+t+' Bitte sichern.</span><button class="btn sm primary" data-act="export">Backup jetzt</button></div>';
+}
+async function shareOrDownload(name,text,mime){
+ const blob=new Blob([text],{type:mime});
+ try{const f=new File([blob],name,{type:mime});
+  if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f],title:name});return true;}
+ }catch(e){if(e&&e.name==='AbortError')return false;}
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();
+ setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);return true;
+}
+async function doExport(){
+ const txt=JSON.stringify({app:'mitarbeit',version:1,exported:new Date().toISOString(),db},null,1);
+ const ok=await shareOrDownload('mitarbeit-backup-'+today()+'.json',txt,'application/json');
+ if(ok){db.lastBackup=new Date().toISOString();save();toast('Backup erstellt');render();}
+}
+function doImport(file){
+ if(!file)return;const r=new FileReader();
+ r.onload=()=>{try{const o=JSON.parse(r.result);const d=o.db||o;if(!d||!Array.isArray(d.classes))throw 0;
+   const n=d.classes.reduce((a,c)=>a+c.lessons.length,0);
+   if(!confirm('Backup einlesen?\n'+d.classes.length+' Klasse(n), '+n+' Stunden'+(o.exported?'\nvom '+new Date(o.exported).toLocaleString('de-DE'):'')+'\n\nACHTUNG: Die aktuellen Daten auf diesem Gerät werden ersetzt.'))return;
+   db=d;if(!db.lastBackup)db.lastBackup=o.exported||null;save();go('home');toast('Backup eingelesen');
+  }catch(e){toast('Datei ist kein gültiges Backup',true);}};
+ r.readAsText(file);document.getElementById('importFile').value='';
+}
+
+/* ---------- Auswertung ---------- */
+function evalStu(c,sid,lessons){
+ const L=lessons.filter(l=>l.present.includes(sid));
+ const r={n:L.length,abs:lessons.filter(l=>(l.absent||[]).includes(sid)).length,viel:0,wenig:0,nie:0,distN:0,haN:0,haMiss:0,kommN:0,nonEnN:0,notes:[],pts:{},det:{}};
+ const qs=[];
+ L.forEach(l=>{const m=l.meld[sid]||0;
+  if(m===2)r.viel++;else if(m===1)r.wenig++;else r.nie++;
+  if(m>0&&l.qual&&l.qual[sid])qs.push(l.qual[sid]);
+  if((l.nonEn||[]).includes(sid)||(!l.nonEn&&l.lang&&l.lang[sid]===0))r.nonEnN++;
+  if((l.dist||[]).includes(sid))r.distN++;
+  if(l.ha){r.haN++;if(l.ha.includes(sid))r.haMiss++;}
+  if((l.komm||[]).includes(sid))r.kommN++;
+  if(l.notes&&l.notes[sid])r.notes.push({date:l.date,t:l.notes[sid]});
+ });
+ if(!r.n)return r;
+ const cr=k=>RASTER[c.subject].crit.find(x=>x.k===k);
+ r.pts.quant=(r.viel*2+r.wenig)/(2*r.n)*cr('quant').max;
+ r.det.quant=r.viel+'× viel, '+r.wenig+'× bisschen, '+r.nie+'× gar nicht (von '+r.n+' Std.)';
+ const qm=cr('qual').max;
+ r.pts.qual=qs.length?1+((mean(qs)-1)/2)*(qm-1):0;
+ r.det.qual=qs.length?'Ø '+nf(mean(qs))+' (1 = schwach … 3 = gut) aus '+qs.length+' Std. mit Beiträgen':'keine Beiträge';
+ const dS=r.distN/r.n,hS=r.haN?r.haMiss/r.haN:0;
+ const haTxt=r.haN?' · Hausaufgaben fehlten '+r.haMiss+'× (von '+r.haN+' Kontrollen)':' · keine HA-Kontrollen';
+ if(c.subject==='ma'){
+  r.pts.komm=r.kommN/r.n*3;r.det.komm='in '+r.kommN+' von '+r.n+' Std. gezeigt';
+  r.pts.arbeit=(r.haN?((1-dS)+(1-hS))/2:1-dS)*4;
+ }else{
+  r.pts.lang=(1-r.nonEnN/r.n)*6;
+  r.det.lang=r.nonEnN+'× auffällig nicht einsprachig (von '+r.n+' Std.)';
+  r.pts.arbeit=(1-dS)*5;
+ }
+ r.det.arbeit=r.distN+'× abgelenkt/gestört (von '+r.n+' Std.)'+haTxt;
+ return r;
+}
+function level(cr,p){const v=Math.round(p/cr.step)*cr.step;for(const lv of cr.lv){if(v>=lv[0]-1e-9)return{v,lv};}return{v,lv:cr.lv[cr.lv.length-1]};}
+/* ---------- Bewertungszeiträume ---------- */
+// Ein Zeitraum gilt ab seinem Startdatum bis zum Tag vor dem Start des nächsten.
+function periods(c){return(c.periods&&c.periods.length)?c.periods.slice().sort((a,b)=>a.start<b.start?-1:a.start>b.start?1:0):[{id:'_p1',name:'Zeitraum 1',start:''}];}
+function pBounds(c,pid){const ps=periods(c),i=ps.findIndex(p=>p.id===pid);if(i<0)return null;return{p:ps[i],from:ps[i].start,to:ps[i+1]?ps[i+1].start:''};}
+function curPeriod(c){const ps=periods(c);return ps[ps.length-1];}
+function periodOf(c,date){const ps=periods(c);let r=ps[0];ps.forEach(p=>{if(!p.start||date>=p.start)r=p;});return r;}
+function pLabel(c,pid){const b=pBounds(c,pid);if(!b)return 'Alle Stunden';const prev=b.to?(()=>{const d=new Date(b.to+'T12:00');d.setDate(d.getDate()-1);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());})():'';
+ return b.p.name+' ('+(b.from?fmtDate(b.from).slice(4):'Beginn')+' – '+(prev?fmtDate(prev).slice(4):'heute')+')';}
+function rangeLessons(c){if(S.pid==='all')return c.lessons;const b=pBounds(c,S.pid)||pBounds(c,curPeriod(c).id);return c.lessons.filter(l=>(!b.from||l.date>=b.from)&&(!b.to||l.date<b.to));}
+
+/* ---------- Views ---------- */
+function vHome(){
+ let h=hdr('Mündliche Mitarbeit')+backupBanner();
+ if(!db.classes.length)h+='<p class="muted">Noch keine Klasse angelegt.</p>';
+ h+='<div class="list">'+db.classes.map(c=>{const last=c.lessons.length?c.lessons[c.lessons.length-1].date:null;
+  return '<button class="card subj-'+c.subject+'" data-act="openClass" data-id="'+c.id+'"><div class="ct">'+esc(c.name)+'</div><small>'+RASTER[c.subject].name+' · '+activeS(c).length+' Kürzel · '+c.lessons.length+' Stunden'+(last?' · zuletzt '+fmtDate(last):'')+'</small></button>';}).join('')+'</div>';
+ h+='<button class="btn" data-act="newClass">+ Neue Klasse</button>';
+ h+='<h2>Datensicherung</h2><div class="panel"><p class="muted" style="margin-top:0">Alle Daten liegen nur auf diesem Gerät. '+(db.lastBackup?'Letztes Backup: '+new Date(db.lastBackup).toLocaleString('de-DE')+'.':'Noch kein Backup.')+' Das Backup als Datei sichern (z. B. „In Dateien sichern“ → „Auf meinem iPad“) und regelmäßig auf einen Stick oder den Laptop kopieren.</p><div class="btnrow"><button class="btn primary" data-act="export">Backup erstellen</button><button class="btn" data-act="import">Backup einlesen</button></div></div>';
+ return h;
+}
+function vClass(){
+ const c=cls(S.cid);if(!c)return go('home');
+ let h=hdr(esc(c.name)+' <small style="display:inline">'+RASTER[c.subject].name+'</small>','home')+backupBanner();
+ h+='<button class="btn primary big" data-act="startW">Stunde auswerten</button>';
+ h+='<div class="btnrow"><button class="btn" data-act="toEval">Auswertung</button><button class="btn" data-act="editClass">Klasse bearbeiten</button></div>';
+ const ps=periods(c),cp=curPeriod(c);
+ h+='<h2>Bewertungszeitraum</h2><div class="panel"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="flex:1"><b style="color:var(--acc)">Aktuell: '+esc(pLabel(c,cp.id))+'</b>'+(ps.length>1?'<small>'+ps.length+' Zeiträume angelegt</small>':'')+'</div>'+(S.np?'':'<button class="btn sm primary" data-act="npOpen">Neuen Bewertungszeitraum starten</button>')+'</div>';
+ if(S.np)h+='<div style="margin-top:12px"><label class="row">Name <input type="text" data-bind="npname" value="'+esc(S.np.name)+'"></label><label class="row">Beginnt am <input type="date" data-bind="npdate" value="'+S.np.start+'"></label><small style="margin-bottom:8px">Alle Stunden ab diesem Datum gehören zum neuen Zeitraum. Ältere Stunden bleiben im bisherigen Zeitraum und können weiter ausgewertet werden.</small><div class="btnrow"><button class="btn" data-act="npCancel">Abbrechen</button><button class="btn go" data-act="npSave">Zeitraum starten</button></div></div>';
+ if(ps.length>1&&!S.np)h+='<div style="margin-top:10px">'+ps.slice().reverse().map(p=>'<div class="srow" style="border-top:1px solid var(--line2);padding-top:6px"><span style="flex:1">'+esc(pLabel(c,p.id))+'</span><button data-act="pRen" data-id="'+p.id+'" aria-label="umbenennen">✎</button>'+(p.start?'<button data-act="pDel" data-id="'+p.id+'" aria-label="löschen">✕</button>':'')+'</div>').join('')+'</div>';
+ h+='</div>';
+ h+='<h2>Erfasste Stunden ('+c.lessons.length+')</h2>';
+ if(!c.lessons.length)h+='<p class="muted">Noch keine Stunde erfasst.</p>';
+ let lastP=null;
+ h+='<div class="list">'+c.lessons.slice().reverse().map(l=>{const g=Object.keys(l.meld).length;const pp=periodOf(c,l.date);const head=(ps.length>1&&pp!==lastP)?'<div style="font-weight:800;color:var(--acc);margin-top:8px">'+esc(pp.name)+'</div>':'';lastP=pp;
+  return head+'<div class="card" style="cursor:default"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="flex:1"><b>'+fmtDate(l.date)+'</b><small>'+l.present.length+' anwesend · '+g+' gemeldet · '+(l.absent||[]).length+' fehlten'+(l.notes&&Object.keys(l.notes).length?' · '+Object.keys(l.notes).length+' Notiz(en)':'')+'</small></div><button class="btn sm" data-act="lEdit" data-id="'+l.id+'">Bearbeiten</button><button class="btn sm danger" data-act="lDel" data-id="'+l.id+'">Löschen</button></div></div>';}).join('')+'</div>';
+ return h;
+}
+function vEdit(){
+ const e=S.edit;
+ let h=hdr(e.id?'Klasse bearbeiten':'Neue Klasse',e.id?'openClassCur':'home');
+ h+='<label class="row">Name <input type="text" data-bind="ename" value="'+esc(e.name)+'" placeholder="z. B. 8b Englisch"></label>';
+ h+='<div class="seg" style="margin:10px 0">'+['ma','en'].map(s=>'<button class="'+(e.subject===s?'on':'')+'" data-act="esub" data-v="'+s+'">'+RASTER[s].name+'</button>').join('')+'</div>';
+ h+='<h2>Kürzel</h2><p class="muted">Nur Nummern aus dem Klassenbuch oder Kürzel (z. B. 2+2 Buchstaben) eintragen, keine vollständigen Namen. Leere Felder werden ignoriert. Symbol antippen: ● weiblich → ▼ männlich → keins.</p>';
+ const act=e.students.filter(s=>s.active!==false);
+ h+=act.map((s,i)=>'<div class="srow"><span class="nr">'+(i+1)+'</span><button class="gbtn" data-act="sg" data-id="'+s.id+'" aria-label="Symbol wechseln">'+(SYM[s.g]||'<span class="muted">–</span>')+'</button><input type="text" data-bind="scode" data-id="'+s.id+'" value="'+esc(s.code)+'" autocapitalize="characters" autocomplete="off"><button data-act="sdel" data-id="'+s.id+'" aria-label="entfernen">✕</button></div>').join('');
+ h+='<div class="btnrow"><button class="btn sm" data-act="sadd">+ Feld</button><button class="btn sm" data-act="snum">Leere Felder mit Nummern füllen</button></div>';
+ const ina=e.students.filter(s=>s.active===false);
+ if(ina.length)h+='<h2>Entfernt</h2><p class="muted">Bisherige Daten bleiben erhalten.</p>'+ina.map(s=>'<div class="srow"><span class="nr"></span><input type="text" value="'+esc(s.code)+'" disabled><button data-act="srest" data-id="'+s.id+'" aria-label="wiederherstellen">↺</button></div>').join('');
+ h+='<div class="btnrow" style="margin-top:20px"><button class="btn go" data-act="esave">Speichern</button></div>';
+ if(e.id)h+='<div class="btnrow"><button class="btn danger" data-act="cdel">Klasse mit allen Daten löschen</button></div>';
+ return h;
+}
+
+/* ---------- Wizard ---------- */
+function stepsFor(c){const s=['abs','viel','wenig','qual'];s.push(c.subject==='ma'?'komm':'lang');s.push('abg','ha','notiz','fertig');return s;}
+function startWizard(c,l){
+ const ids=new Set(l?[...l.present,...(l.absent||[])]:activeS(c).map(s=>s.id));
+ const roster=c.students.filter(s=>ids.has(s.id)).map((s,i)=>({s,i})).sort((a,b)=>(GORD[a.s.g||'']-GORD[b.s.g||''])||a.i-b.i).map(x=>x.s.id);
+ const arr2map=a=>{const m={};(a||[]).forEach(id=>m[id]=true);return m;};
+ S.w={cid:c.id,lid:l?l.id:null,step:0,roster,date:l?l.date:today(),
+  absent:arr2map(l&&l.absent),meld:l?{...l.meld}:{},qual:l?{...(l.qual||{})}:{},lang:l?{...(l.lang||{})}:{},
+  komm:arr2map(l&&l.komm),nonEn:arr2map(l&&(l.nonEn||(l.lang?Object.keys(l.lang).filter(k=>l.lang[k]===0):[]))),dist:arr2map(l&&l.dist),noHA:arr2map(l&&l.ha),haSkip:l?!l.ha:false,notes:l?{...(l.notes||{})}:{},noteSel:null};
+ go('wizard');
+}
+function seg(id,f,opts,cur){return '<div class="seg">'+opts.map(([v,t])=>'<button class="'+(cur===v?'on':'')+'" data-act="seg" data-id="'+id+'" data-f="'+f+'" data-v="'+v+'">'+t+'</button>').join('')+'</div>';}
+function vWizard(){
+ const w=S.w,c=cls(w.cid),steps=stepsFor(c),st=steps[w.step];
+ const present=w.roster.filter(id=>!w.absent[id]);
+ const chips=(ids,on,dis,lab,extra)=>{const gs=['f','m',''].map(g=>ids.filter(id=>gOf(c,id)===g)).filter(a=>a.length);return gs.map(grp=>'<div class="chips">'+grp.map(id=>{const o=on(id),d=dis&&dis(id),lb=lab&&lab(id);
+   return '<button class="chip'+(o?' on':'')+(d?' dis':'')+(extra?extra(id):'')+'" data-act="chip" data-id="'+id+'"'+(d?' disabled':'')+'>'+(SYM[gOf(c,id)]||'')+esc(code(c,id))+(lb?'<small>'+lb+'</small>':'')+'</button>';}).join('')+'</div>').join('<hr class="gsep">');};
+ let t='',sub='',b='';
+ switch(st){
+  case 'abs':t='Wer fehlte?';sub='Antippen = abwesend. Fehlte niemand, einfach „Weiter“.';
+   b='<label class="row">Datum <input type="date" data-bind="wdate" value="'+w.date+'"></label>'+chips(w.roster,id=>w.absent[id],null,id=>w.absent[id]?'fehlt':'');break;
+  case 'viel':t='Wer hat sich viel gemeldet?';b=chips(present,id=>w.meld[id]===2);break;
+  case 'wenig':t='Wer hat sich ein bisschen gemeldet?';sub='Alle nicht Markierten zählen als „gar nicht gemeldet“.';
+   b=chips(present,id=>w.meld[id]===1,id=>w.meld[id]===2,id=>w.meld[id]===2?'viel':'');break;
+  case 'qual':{const con=present.filter(id=>w.meld[id]>0);
+   con.forEach(id=>{if(!w.qual[id])w.qual[id]=2;});
+   t='Wie waren die Beiträge?';sub='Vorausgewählt ist „mittel“.';
+   b=con.length?'<div class="rows">'+con.map(id=>'<div class="qrow"><div class="qc">'+esc(code(c,id))+'<small>'+(w.meld[id]===2?'viel':'bisschen')+'</small></div><div style="flex:1;display:grid;gap:8px;min-width:250px">'+seg(id,'qual',[[1,'schwach'],[2,'mittel'],[3,'gut']],w.qual[id])+'</div></div>').join('')+'</div>':'<p class="muted">Heute hat sich niemand gemeldet.</p>';break;}
+  case 'komm':t='Kommunikative Kompetenzen';sub='Wer hat Beiträge aufgegriffen/vertieft, weiterführende Fragen gestellt oder Mitschüler-Impulse aufgenommen?';
+   b=chips(present,id=>w.komm[id]);break;
+  case 'lang':t='Wer war auffällig nicht einsprachig?';sub='Alle anderen zählen als einsprachig.';b=chips(present,id=>w.nonEn[id]);break;
+  case 'abg':t='Wer war abgelenkt oder hat gestört?';sub='Alle anderen zählen als konzentriert.';b=chips(present,id=>w.dist[id]);break;
+  case 'ha':t='Wer hatte keine Hausaufgaben?';
+   b='<button class="toggle'+(w.haSkip?' on':'')+'" data-act="haSkip">'+(w.haSkip?'✓ ':'')+'Heute keine Hausaufgaben kontrolliert</button>'+(w.haSkip?'<p class="muted">Diese Stunde zählt nicht für die Hausaufgaben.</p>':chips(present,id=>w.noHA[id]));break;
+  case 'notiz':t='Notizen (optional)';sub='Kürzel antippen und Notiz schreiben. Gestrichelt = hat schon eine Notiz.';
+   b=chips(present,id=>w.noteSel===id,null,null,id=>w.notes[id]&&w.notes[id].trim()?' hasnote':'');
+   if(w.noteSel)b+='<div class="panel"><b>Notiz zu '+esc(code(c,w.noteSel))+'</b><textarea id="noteTa" data-bind="note" style="margin-top:8px">'+esc(w.notes[w.noteSel]||'')+'</textarea></div>';break;
+  case 'fertig':{const g=present.filter(id=>w.meld[id]===2),k=present.filter(id=>w.meld[id]===1),n=present.filter(id=>!w.meld[id]);
+   t='Zusammenfassung';sub=fmtDate(w.date)+' · '+present.length+' von '+w.roster.length+' anwesend';
+   b='<dl class="sum panel"><dt>Fehlten</dt><dd>'+codes(c,w.roster.filter(id=>w.absent[id]))+'</dd><dt>Viel gemeldet</dt><dd>'+codes(c,g)+'</dd><dt>Bisschen gemeldet</dt><dd>'+codes(c,k)+'</dd><dt>Gar nicht gemeldet ('+n.length+')</dt><dd>'+codes(c,n)+'</dd>'+
+    (c.subject==='ma'?'<dt>Kommunikative Kompetenzen</dt><dd>'+codes(c,present.filter(id=>w.komm[id]))+'</dd>':'<dt>Auffällig nicht einsprachig</dt><dd>'+codes(c,present.filter(id=>w.nonEn[id]))+'</dd>')+
+    '<dt>Abgelenkt/gestört</dt><dd>'+codes(c,present.filter(id=>w.dist[id]))+'</dd><dt>Keine Hausaufgaben</dt><dd>'+(w.haSkip?'nicht kontrolliert':codes(c,present.filter(id=>w.noHA[id])))+'</dd><dt>Notizen</dt><dd>'+(present.filter(id=>w.notes[id]&&w.notes[id].trim()).length||'–')+'</dd></dl>';break;}
+ }
+ let h='<div class="prog"><i style="width:'+((w.step+1)/steps.length*100)+'%"></i></div><small>'+esc(c.name)+(w.lid?' · Stunde bearbeiten':'')+'</small><div class="wtitle">'+t+'</div>'+(sub?'<p class="wsub">'+sub+'</p>':'')+b;
+ h+='<div class="wnav"><button class="btn" data-act="wBack">'+(w.step?'‹ Zurück':'Abbrechen')+'</button><span class="cnt">'+(w.step+1)+'/'+steps.length+'</span>'+(st==='fertig'?'<button class="btn go" data-act="wSave">Speichern</button>':'<button class="btn primary" data-act="wNext">Weiter ›</button>')+'</div>';
+ return h;
+}
+function wSave(){
+ const w=S.w,c=cls(w.cid);
+ const present=w.roster.filter(id=>!w.absent[id]);
+ const l={id:w.lid||uid(),date:w.date||today(),present,absent:w.roster.filter(id=>w.absent[id]),meld:{},qual:{},komm:[],dist:[],ha:w.haSkip?null:[],notes:{}};
+ if(c.subject==='en')l.nonEn=[];
+ present.forEach(id=>{const m=w.meld[id];if(m){l.meld[id]=m;l.qual[id]=w.qual[id]||2;}if(l.nonEn&&w.nonEn[id])l.nonEn.push(id);
+  if(w.komm[id]&&c.subject==='ma')l.komm.push(id);if(w.dist[id])l.dist.push(id);if(!w.haSkip&&w.noHA[id])l.ha.push(id);
+  const n=(w.notes[id]||'').trim();if(n)l.notes[id]=n;});
+ if(w.lid){const i=c.lessons.findIndex(x=>x.id===w.lid);c.lessons[i]=l;}else c.lessons.push(l);
+ c.lessons.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
+ if(save()){S.w=null;go('class',{cid:c.id});toast('Stunde gespeichert');}
+}
+
+/* ---------- Auswertung View ---------- */
+function vEval(){
+ const c=cls(S.cid),R=RASTER[c.subject],L=rangeLessons(c);
+ let h=hdr('Auswertung '+esc(c.name),'openClassCur');
+ const ps=periods(c);if(S.pid==null||(S.pid!=='all'&&!pBounds(c,S.pid)))S.pid=curPeriod(c).id;
+ h+='<div class="seg" style="margin-bottom:6px;flex-wrap:wrap">'+ps.map(p=>'<button class="'+(S.pid===p.id?'on':'')+'" data-act="pSel" data-id="'+p.id+'">'+esc(p.name)+'</button>').join('')+(ps.length>1?'<button class="'+(S.pid==='all'?'on':'')+'" data-act="pSel" data-id="all">Alle</button>':'')+'</div><p style="margin:4px 0 10px;font-weight:700">'+esc(S.pid==='all'?'Alle Zeiträume':pLabel(c,S.pid))+'</p>';
+ h+='<p class="muted">'+L.length+' Stunden im Zeitraum. Werte sind <b>Vorschläge</b> für die Rasterstufe (darunter der genaue Wert). Zeile antippen für Details.</p>';
+ const studs=c.students.filter(s=>s.active!==false||L.some(l=>l.present.includes(s.id)||(l.absent||[]).includes(s.id)));
+ h+='<div class="tw"><table><thead><tr><th>Kürzel</th><th>Std.</th><th>fehlte</th><th>viel / bissch. / nie</th>'+R.crit.map(cr=>'<th>'+cr.s+'<br>(max '+nf(cr.max,0)+')</th>').join('')+'<th>Σ</th><th>Notiz</th></tr></thead><tbody>';
+ h+=studs.map(s=>{const r=evalStu(c,s.id,L);
+  if(!r.n)return '<tr class="click" data-act="openStu" data-id="'+s.id+'"><td><b>'+esc(s.code)+'</b></td><td>0</td><td>'+r.abs+'</td><td colspan="'+(R.crit.length+3)+'" class="muted">keine Daten</td></tr>';
+  let sum=0;const cells=R.crit.map(cr=>{const x=level(cr,r.pts[cr.k]);sum+=x.v;return '<td><b>'+x.lv[1]+'</b><small>'+nf(r.pts[cr.k])+'</small></td>';}).join('');
+  const never=r.viel+r.wenig===0;
+  return '<tr class="click'+(never?' never':'')+'" data-act="openStu" data-id="'+s.id+'"><td><b>'+esc(s.code)+'</b></td><td>'+r.n+'</td><td>'+r.abs+'</td><td>'+(never?'<span class="tag bad">nie gemeldet</span>':r.viel+' / '+r.wenig+' / '+r.nie)+'</td>'+cells+'<td><b>'+nf(sum,sum%1?1:0)+'</b></td><td>'+(r.notes.length||'')+'</td></tr>';}).join('');
+ h+='</tbody></table></div><div class="btnrow"><button class="btn" data-act="csv">Als Tabelle exportieren (CSV)</button></div>';
+ return h;
+}
+function vStu(){
+ const c=cls(S.cid),R=RASTER[c.subject],L=rangeLessons(c),r=evalStu(c,S.sid,L);
+ let h=hdr(esc(code(c,S.sid)),'toEval');
+ h+='<p class="muted">'+esc(S.pid==='all'?'Alle Zeiträume':pLabel(c,S.pid))+' · anwesend in '+r.n+' Std. · fehlte '+r.abs+'×</p>';
+ if(r.n&&r.viel+r.wenig===0)h+='<div class="banner" style="background:var(--bad);border-color:var(--badb)"><span>Hat sich in keiner der '+r.n+' anwesenden Stunden gemeldet.</span></div>';
+ if(r.n)R.crit.forEach(cr=>{const x=level(cr,r.pts[cr.k]);
+  h+='<div class="panel"><b>'+cr.t+'</b> – Vorschlag: <b>'+x.lv[1]+'</b> <span class="muted">(genau '+nf(r.pts[cr.k])+' von '+nf(cr.max,0)+')</span><small style="margin:4px 0 8px">'+r.det[cr.k]+'</small>'+(cr.d?'<small style="margin-bottom:8px"><i>'+cr.d+'</i></small>':'')+
+   cr.lv.map(lv=>'<div class="lv'+(lv===x.lv?' hit':'')+'"><span class="p">'+lv[1]+'</span><span>'+lv[2]+'</span></div>').join('')+'</div>';});
+ h+='<h2>Notizen</h2>'+(r.notes.length?'<div class="panel hist">'+r.notes.map(n=>'<div><b>'+fmtDate(n.date)+':</b> '+esc(n.t)+'</div>').join('')+'</div>':'<p class="muted">Keine Notizen.</p>');
+ h+='<h2>Verlauf</h2><div class="panel hist">'+L.slice().reverse().map(l=>{const id=S.sid;
+  if((l.absent||[]).includes(id))return '<div><b>'+fmtDate(l.date)+'</b> – fehlte</div>';
+  if(!l.present.includes(id))return '';
+  const m=l.meld[id]||0,p=[m===2?'viel gemeldet':m===1?'bisschen gemeldet':'nicht gemeldet'];
+  if(m)p.push('Qualität '+['','schwach','mittel','gut'][l.qual[id]||2]);
+  if((l.nonEn||[]).includes(id)||(!l.nonEn&&l.lang&&l.lang[id]===0))p.push('<span class="tag bad">nicht einsprachig</span>');
+  if((l.komm||[]).includes(id))p.push('komm. Kompetenz');
+  if((l.dist||[]).includes(id))p.push('<span class="tag bad">abgelenkt/gestört</span>');
+  if(l.ha&&l.ha.includes(id))p.push('<span class="tag bad">keine HA</span>');
+  return '<div><b>'+fmtDate(l.date)+'</b> – '+p.join(' · ')+'</div>';}).join('')+'</div>';
+ return h;
+}
+function doCSV(){
+ const c=cls(S.cid),R=RASTER[c.subject],L=rangeLessons(c);const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+ const rows=[['Kürzel','Std. anwesend','fehlte','viel','bisschen','gar nicht',...R.crit.flatMap(cr=>[cr.t+' Stufe',cr.t+' genau']),'Summe Stufen','abgelenkt/gestört','HA fehlte','HA-Kontrollen','Notizen'].map(q).join(';')];
+ c.students.forEach(s=>{const r=evalStu(c,s.id,L);if(!r.n&&s.active===false)return;let sum=0;
+  const cc=r.n?R.crit.flatMap(cr=>{const x=level(cr,r.pts[cr.k]);sum+=x.v;return[q(x.lv[1]),nf(r.pts[cr.k])];}):R.crit.flatMap(()=>['','']);
+  rows.push([q(s.code),r.n,r.abs,r.viel,r.wenig,r.nie,...cc,r.n?nf(sum):'',r.distN,r.haMiss,r.haN,q(r.notes.map(n=>n.date+': '+n.t).join(' | '))].join(';'));});
+ shareOrDownload('auswertung-'+c.name.replace(/[^\wäöüÄÖÜß-]+/g,'_')+'-'+today()+'.csv','﻿'+rows.join('\r\n'),'text/csv');
+}
+
+/* ---------- Aktionen ---------- */
+const A={
+ home:()=>go('home'),
+ openClass:d=>go('class',{cid:d.id,np:null}),
+ openClassCur:()=>{S.edit=null;go(S.cid&&cls(S.cid)?'class':'home');},
+ newClass:()=>{S.edit={id:null,name:'',subject:'ma',students:Array.from({length:30},()=>({id:uid(),code:'',active:true,_new:true}))};go('edit');},
+ editClass:()=>{const c=cls(S.cid);S.edit={id:c.id,name:c.name,subject:c.subject,students:c.students.map(s=>({...s}))};go('edit');},
+ esub:d=>{const c=S.edit.id&&cls(S.edit.id);if(c&&c.lessons.length&&d.v!==c.subject&&!confirm('Fach wirklich ändern? Bereits erfasste Stunden passen dann evtl. nicht mehr zum Raster.'))return;S.edit.subject=d.v;render();},
+ sadd:()=>{S.edit.students.push({id:uid(),code:'',active:true,_new:true});render();},
+ snum:()=>{const used=new Set(S.edit.students.map(s=>s.code.trim()));let n=1;S.edit.students.filter(s=>s.active!==false).forEach(s=>{if(!s.code.trim()){while(used.has(String(n)))n++;s.code=String(n);used.add(s.code);}});render();},
+ sdel:d=>{const e=S.edit,s=e.students.find(x=>x.id===d.id);if(s._new)e.students=e.students.filter(x=>x!==s);else s.active=false;render();},
+ sg:d=>{const s=S.edit.students.find(x=>x.id===d.id);s.g=s.g==='f'?'m':s.g==='m'?'':'f';render();},
+ srest:d=>{S.edit.students.find(x=>x.id===d.id).active=true;render();},
+ esave:()=>{const e=S.edit;
+  e.students=e.students.filter(s=>!(s._new&&!s.code.trim()));
+  e.students.forEach(s=>{s.code=s.code.trim();});
+  const old=e.id?cls(e.id):null;
+  for(const s of e.students){if(!s.code){const o=old&&old.students.find(x=>x.id===s.id);if(o)s.code=o.code;else{toast('Leeres Kürzel',true);return;}}}
+  const act=e.students.filter(s=>s.active!==false).map(s=>s.code.toLowerCase());
+  const dup=act.find((x,i)=>act.indexOf(x)!==i);if(dup){toast('Kürzel doppelt: '+dup,true);return;}
+  const studs=e.students.map(({_new,...s})=>s);
+  if(old){old.name=e.name.trim()||old.name;old.subject=e.subject;old.students=studs;}
+  else{e.id=uid();db.classes.push({id:e.id,name:e.name.trim()||'Neue Klasse',subject:e.subject,students:studs,lessons:[]});}
+  if(save()){S.cid=e.id;S.edit=null;go('class');toast('Gespeichert');}},
+ cdel:()=>{const c=cls(S.edit.id);if(!confirm('Klasse „'+c.name+'“ mit '+c.lessons.length+' Stunden endgültig löschen?'))return;db.classes=db.classes.filter(x=>x!==c);save();S.edit=null;go('home');},
+ startW:()=>startWizard(cls(S.cid)),
+ lEdit:d=>{const c=cls(S.cid);startWizard(c,c.lessons.find(l=>l.id===d.id));},
+ lDel:d=>{const c=cls(S.cid),l=c.lessons.find(x=>x.id===d.id);if(!confirm('Stunde vom '+fmtDate(l.date)+' löschen?'))return;c.lessons=c.lessons.filter(x=>x!==l);save();render();},
+ chip:d=>{const w=S.w,st=stepsFor(cls(w.cid))[w.step],id=d.id;
+  if(st==='abs'){if(w.absent[id])delete w.absent[id];else{w.absent[id]=true;['meld','qual','komm','nonEn','dist','noHA','notes'].forEach(k=>delete w[k][id]);}}
+  else if(st==='viel'){if(w.meld[id]===2)delete w.meld[id];else w.meld[id]=2;}
+  else if(st==='wenig'){if(w.meld[id]===1)delete w.meld[id];else if(!w.meld[id])w.meld[id]=1;}
+  else if(st==='komm'){w.komm[id]?delete w.komm[id]:w.komm[id]=true;}
+  else if(st==='lang'){w.nonEn[id]?delete w.nonEn[id]:w.nonEn[id]=true;}
+  else if(st==='abg'){w.dist[id]?delete w.dist[id]:w.dist[id]=true;}
+  else if(st==='ha'){w.noHA[id]?delete w.noHA[id]:w.noHA[id]=true;}
+  else if(st==='notiz'){w.noteSel=w.noteSel===id?null:id;render();const ta=document.getElementById('noteTa');if(ta)ta.focus();return;}
+  render();},
+ seg:d=>{S.w[d.f][d.id]=+d.v;render();},
+ haSkip:()=>{S.w.haSkip=!S.w.haSkip;render();},
+ wNext:()=>{const w=S.w;if(!w.date){toast('Bitte Datum wählen',true);return;}w.step++;w.noteSel=null;render();window.scrollTo(0,0);},
+ wBack:()=>{const w=S.w;if(w.step){w.step--;render();window.scrollTo(0,0);}else if(confirm('Erfassung abbrechen? Eingaben gehen verloren.')){S.w=null;go('class');}},
+ wSave:()=>wSave(),
+ toEval:()=>{S.pid=curPeriod(cls(S.cid)).id;go('eval');},
+ pSel:d=>{S.pid=d.id;render();},
+ npOpen:()=>{const c=cls(S.cid);S.np={name:'Zeitraum '+(periods(c).length+1),start:today()};render();},
+ npCancel:()=>{S.np=null;render();},
+ npSave:()=>{const c=cls(S.cid),np=S.np,ps=periods(c);
+  if(!np.start){toast('Bitte Startdatum wählen',true);return;}
+  if(ps.some(p=>p.start&&p.start>=np.start)){toast('Startdatum muss nach dem Beginn des letzten Zeitraums liegen',true);return;}
+  if(!c.periods||!c.periods.length)c.periods=[{id:uid(),name:'Zeitraum 1',start:''}];
+  c.periods.push({id:uid(),name:np.name.trim()||('Zeitraum '+(ps.length+1)),start:np.start});
+  S.np=null;if(save())toast('Neuer Zeitraum gestartet');render();},
+ pRen:d=>{const c=cls(S.cid);if(!c.periods||!c.periods.length)c.periods=[{id:uid(),name:'Zeitraum 1',start:''}];const p=c.periods.find(x=>x.id===d.id)||c.periods[0];const n=prompt('Neuer Name:',p.name);if(n&&n.trim()){p.name=n.trim();save();render();}},
+ pDel:d=>{const c=cls(S.cid),p=c.periods.find(x=>x.id===d.id);if(!confirm('Zeitraum „'+p.name+'“ entfernen?\nEs werden KEINE Stunden gelöscht – sie zählen dann zum vorherigen Zeitraum.'))return;c.periods=c.periods.filter(x=>x!==p);save();render();},
+ openStu:d=>go('stu',{sid:d.id}),
+ csv:()=>doCSV(),
+ export:()=>doExport(),
+ import:()=>document.getElementById('importFile').click()
+};
+const BIND={
+ ename:t=>S.edit.name=t.value,
+ scode:t=>{S.edit.students.find(s=>s.id===t.dataset.id).code=t.value;},
+ wdate:t=>S.w.date=t.value,
+ note:t=>{S.w.notes[S.w.noteSel]=t.value;},
+ npname:t=>{S.np.name=t.value;},
+ npdate:t=>{S.np.start=t.value;}
+};
+app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const f=A[b.dataset.act];if(f)f(b.dataset,b,e);});
+app.addEventListener('input',e=>{const t=e.target;if(t.dataset.bind&&t.type!=='date'){const f=BIND[t.dataset.bind];if(f)f(t);}});
+app.addEventListener('change',e=>{const t=e.target;if(t.dataset.bind&&t.type==='date'){const f=BIND[t.dataset.bind];if(f)f(t);}});
+document.getElementById('importFile').addEventListener('change',e=>doImport(e.target.files[0]));
+
+function render(){
+ const v={home:vHome,class:vClass,edit:vEdit,wizard:vWizard,eval:vEval,stu:vStu}[S.view]||vHome;
+ const sc=S.view==='edit'&&S.edit?S.edit.subject:S.view==='wizard'&&S.w?(cls(S.w.cid)||{}).subject:['class','eval','stu'].includes(S.view)?(cls(S.cid)||{}).subject:'';
+ document.body.dataset.subj=sc||'';
+ const h=v();if(typeof h==='string')app.innerHTML=h;
+}
+render();
+if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+</script>
+</body>
+</html>
