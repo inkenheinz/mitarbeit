@@ -291,7 +291,7 @@ function vEdit(){
  let h=hdr(e.id?'Klasse bearbeiten':'Neue Klasse',e.id?'openClassCur':'home');
  h+='<label class="row">Name <input type="text" data-bind="ename" value="'+esc(e.name)+'" placeholder="z. B. 8b Englisch"></label>';
  h+='<div class="seg" style="margin:10px 0">'+['ma','en'].map(s=>'<button class="'+(e.subject===s?'on':'')+'" data-act="esub" data-v="'+s+'">'+RASTER[s].name+'</button>').join('')+'</div>';
- h+='<h2>Kürzel</h2><p class="muted">Nur Nummern aus dem Klassenbuch oder Kürzel (z. B. 2+2 Buchstaben) eintragen, keine vollständigen Namen. Leere Felder werden ignoriert.</p>';
+ h+='<h2>Kürzel</h2><p class="muted">Keine vollständigen Namen. Leere Felder werden ignoriert.</p>';
  const act=e.students.filter(s=>s.active!==false);
  h+=act.map((s,i)=>'<div class="srow"><span class="nr">'+(i+1)+'</span><button class="gbtn" data-act="sg" data-id="'+s.id+'" aria-label="Symbol wechseln">'+(SYM[s.g]||'<span class="muted">–</span>')+'</button><input type="text" data-bind="scode" data-id="'+s.id+'" value="'+esc(s.code)+'" autocapitalize="characters" autocomplete="off"><button data-act="sdel" data-id="'+s.id+'" aria-label="entfernen">✕</button></div>').join('');
  h+='<div class="btnrow"><button class="btn sm" data-act="sadd">+ Feld</button><button class="btn sm" data-act="snum">Leere Felder mit Nummern füllen</button></div>';
