@@ -261,7 +261,7 @@ function vHome(){
  let h=hdr('Mündliche Mitarbeit')+backupBanner();
  if(!db.classes.length)h+='<p class="muted">Noch keine Klasse angelegt.</p>';
  h+='<div class="list">'+db.classes.map(c=>{const last=c.lessons.length?c.lessons[c.lessons.length-1].date:null;
-  return '<button class="card subj-'+c.subject+'" data-act="openClass" data-id="'+c.id+'"><div class="ct">'+esc(c.name)+'</div><small>'+RASTER[c.subject].name+' · '+activeS(c).length+' Kürzel · '+c.lessons.length+' Stunden'+(c.draft?' · <b style="color:#c07a00">angefangene Stunde</b>':'')+(last?' · zuletzt '+fmtDate(last):'')+'</small></button>';}).join('')+'</div>';
+  return '<button class="card subj-'+c.subject+'" data-act="openClass" data-id="'+c.id+'"><div class="ct">'+esc(c.name)+'</div><small>'+RASTER[c.subject].name+' · '+activeS(c).length+' SuS · '+c.lessons.length+' Stunden'+(c.draft?' · <b style="color:#c07a00">angefangene Stunde</b>':'')+(last?' · zuletzt '+fmtDate(last):'')+'</small></button>';}).join('')+'</div>';
  h+='<button class="btn" data-act="newClass">+ Neue Klasse</button>';
  h+='<h2>Datensicherung</h2><div class="panel"><p class="muted" style="margin-top:0">Alle Daten liegen nur auf diesem Gerät. '+(db.lastBackup?'Letztes Backup: '+new Date(db.lastBackup).toLocaleString('de-DE')+'.':'Noch kein Backup.')+' Das Backup als Datei sichern (z. B. „In Dateien sichern“ → „Auf meinem iPad“) und regelmäßig auf einen Stick oder den Laptop kopieren.</p><div class="btnrow"><button class="btn primary" data-act="export">Backup erstellen</button><button class="btn" data-act="import">Backup einlesen</button></div></div>';
  return h;
