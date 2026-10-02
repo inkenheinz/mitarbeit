@@ -109,6 +109,10 @@ svg.sym{width:.8em;height:.8em;margin-right:.3em;vertical-align:baseline;opacity
 .chip.on svg.sym{opacity:1}
 .gbtn svg.sym{width:20px;height:20px;margin:0;opacity:1}
 .gsep{border:0;border-top:1.5px dashed var(--line);margin:4px 0}
+.steps{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:6px}
+.steps button{flex:0 0 auto;border:1.5px solid var(--line);background:var(--chip);border-radius:999px;padding:7px 12px;font-size:14px;font-weight:600;cursor:pointer;color:var(--mut)}
+.steps button.done{color:var(--acc);border-color:var(--acc)}
+.steps button.cur{background:var(--acc);border-color:var(--acc);color:#fff}
 #toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:#1e293b;color:#fff;padding:12px 18px;border-radius:var(--rs);opacity:0;transition:opacity .25s;pointer-events:none;z-index:9;max-width:90vw;font-weight:600}
 #toast.show{opacity:1}
 #toast.err{background:#b42318}
@@ -160,7 +164,7 @@ if(navigator.storage&&navigator.storage.persist){navigator.storage.persist().cat
 
 const cls=id=>db.classes.find(c=>c.id===id);
 const code=(c,id)=>{const s=c.students.find(x=>x.id===id);return s?s.code:'?';};
-const SYM={f:'<svg class="sym" viewBox="0 0 14 14" aria-label="weiblich"><circle cx="7" cy="7" r="6" fill="currentColor"/></svg>',m:'<svg class="sym" viewBox="0 0 14 14" aria-label="männlich"><polygon points="0.5,1.5 13.5,1.5 7,13.5" fill="currentColor"/></svg>'};
+const SYM={f:'<svg class="sym" viewBox="0 0 14 14"><circle cx="7" cy="7" r="6" fill="currentColor"/></svg>',m:'<svg class="sym" viewBox="0 0 14 14"><polygon points="0.5,1.5 13.5,1.5 7,13.5" fill="currentColor"/></svg>'};
 const gOf=(c,id)=>{const s=c.students.find(x=>x.id===id);return s&&s.g||'';};
 const GORD={f:0,m:1,'':2};
 const activeS=c=>c.students.filter(s=>s.active!==false);
@@ -243,11 +247,13 @@ function level(cr,p){const v=Math.round(p/cr.step)*cr.step;for(const lv of cr.lv
 /* ---------- Bewertungszeiträume ---------- */
 // Ein Zeitraum gilt ab seinem Startdatum bis zum Tag vor dem Start des nächsten.
 function periods(c){return(c.periods&&c.periods.length)?c.periods.slice().sort((a,b)=>a.start<b.start?-1:a.start>b.start?1:0):[{id:'_p1',name:'Zeitraum 1',start:''}];}
-function pBounds(c,pid){const ps=periods(c),i=ps.findIndex(p=>p.id===pid);if(i<0)return null;return{p:ps[i],from:ps[i].start,to:ps[i+1]?ps[i+1].start:''};}
+function pBounds(c,pid){const ps=periods(c),i=ps.findIndex(p=>p.id===pid);if(i<0)return null;return{p:ps[i],i,from:i?ps[i].start:'',to:ps[i+1]?ps[i+1].start:''};}
 function curPeriod(c){const ps=periods(c);return ps[ps.length-1];}
 function periodOf(c,date){const ps=periods(c);let r=ps[0];ps.forEach(p=>{if(!p.start||date>=p.start)r=p;});return r;}
-function pLabel(c,pid){const b=pBounds(c,pid);if(!b)return 'Alle Stunden';const prev=b.to?(()=>{const d=new Date(b.to+'T12:00');d.setDate(d.getDate()-1);return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());})():'';
- return b.p.name+' ('+(b.from?fmtDate(b.from).slice(4):'Beginn')+' – '+(prev?fmtDate(prev).slice(4):'heute')+')';}
+function pLabel(c,pid){const b=pBounds(c,pid);if(!b)return 'Alle Stunden';
+ let st=b.p.start;if(!st){const f=c.lessons.find(l=>!b.to||l.date<b.to);st=f?f.date:'';}
+ let en=today();if(b.to){const d=new Date(b.to+'T12:00');d.setDate(d.getDate()-1);en=d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+ const f=x=>x?fmtDate(x).slice(4):'–';return b.p.name+' ('+f(st)+' – '+f(en)+')';}
 function rangeLessons(c){if(S.pid==='all')return c.lessons;const b=pBounds(c,S.pid)||pBounds(c,curPeriod(c).id);return c.lessons.filter(l=>(!b.from||l.date>=b.from)&&(!b.to||l.date<b.to));}
 
 /* ---------- Views ---------- */
@@ -255,7 +261,7 @@ function vHome(){
  let h=hdr('Mündliche Mitarbeit')+backupBanner();
  if(!db.classes.length)h+='<p class="muted">Noch keine Klasse angelegt.</p>';
  h+='<div class="list">'+db.classes.map(c=>{const last=c.lessons.length?c.lessons[c.lessons.length-1].date:null;
-  return '<button class="card subj-'+c.subject+'" data-act="openClass" data-id="'+c.id+'"><div class="ct">'+esc(c.name)+'</div><small>'+RASTER[c.subject].name+' · '+activeS(c).length+' Kürzel · '+c.lessons.length+' Stunden'+(last?' · zuletzt '+fmtDate(last):'')+'</small></button>';}).join('')+'</div>';
+  return '<button class="card subj-'+c.subject+'" data-act="openClass" data-id="'+c.id+'"><div class="ct">'+esc(c.name)+'</div><small>'+RASTER[c.subject].name+' · '+activeS(c).length+' Kürzel · '+c.lessons.length+' Stunden'+(c.draft?' · <b style="color:#c07a00">angefangene Stunde</b>':'')+(last?' · zuletzt '+fmtDate(last):'')+'</small></button>';}).join('')+'</div>';
  h+='<button class="btn" data-act="newClass">+ Neue Klasse</button>';
  h+='<h2>Datensicherung</h2><div class="panel"><p class="muted" style="margin-top:0">Alle Daten liegen nur auf diesem Gerät. '+(db.lastBackup?'Letztes Backup: '+new Date(db.lastBackup).toLocaleString('de-DE')+'.':'Noch kein Backup.')+' Das Backup als Datei sichern (z. B. „In Dateien sichern“ → „Auf meinem iPad“) und regelmäßig auf einen Stick oder den Laptop kopieren.</p><div class="btnrow"><button class="btn primary" data-act="export">Backup erstellen</button><button class="btn" data-act="import">Backup einlesen</button></div></div>';
  return h;
@@ -263,12 +269,15 @@ function vHome(){
 function vClass(){
  const c=cls(S.cid);if(!c)return go('home');
  let h=hdr(esc(c.name)+' <small style="display:inline">'+RASTER[c.subject].name+'</small>','home')+backupBanner();
- h+='<button class="btn primary big" data-act="startW">Stunde auswerten</button>';
+ if(c.draft){const st=stepsFor(c);h+='<button class="btn primary big" data-act="resumeW">Fortsetzen: '+fmtDate(c.draft.date)+'</button><div class="btnrow" style="align-items:center"><small style="flex:2">Zwischengespeichert bei Schritt „'+STEPNAME[st[c.draft.step]||st[0]]+'“'+(c.draft.lid?' (Bearbeitung)':'')+'</small><button class="btn sm danger" data-act="dropDraft">Verwerfen</button></div>';}
+ else h+='<button class="btn primary big" data-act="startW">Stunde auswerten</button>';
  h+='<div class="btnrow"><button class="btn" data-act="toEval">Auswertung</button><button class="btn" data-act="editClass">Klasse bearbeiten</button></div>';
  const ps=periods(c),cp=curPeriod(c);
- h+='<h2>Bewertungszeitraum</h2><div class="panel"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="flex:1"><b style="color:var(--acc)">Aktuell: '+esc(pLabel(c,cp.id))+'</b>'+(ps.length>1?'<small>'+ps.length+' Zeiträume angelegt</small>':'')+'</div>'+(S.np?'':'<button class="btn sm primary" data-act="npOpen">Neuen Bewertungszeitraum starten</button>')+'</div>';
+ h+='<h2>Bewertungszeitraum</h2><div class="panel"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><div style="flex:1"><b style="color:var(--acc)">Aktuell: '+esc(pLabel(c,cp.id))+'</b>'+'</div>'+(S.np?'':'<button class="btn sm primary" data-act="npOpen">Neuen Bewertungszeitraum starten</button>')+'</div>';
  if(S.np)h+='<div style="margin-top:12px"><label class="row">Name <input type="text" data-bind="npname" value="'+esc(S.np.name)+'"></label><label class="row">Beginnt am <input type="date" data-bind="npdate" value="'+S.np.start+'"></label><small style="margin-bottom:8px">Alle Stunden ab diesem Datum gehören zum neuen Zeitraum. Ältere Stunden bleiben im bisherigen Zeitraum und können weiter ausgewertet werden.</small><div class="btnrow"><button class="btn" data-act="npCancel">Abbrechen</button><button class="btn go" data-act="npSave">Zeitraum starten</button></div></div>';
- if(ps.length>1&&!S.np)h+='<div style="margin-top:10px">'+ps.slice().reverse().map(p=>'<div class="srow" style="border-top:1px solid var(--line2);padding-top:6px"><span style="flex:1">'+esc(pLabel(c,p.id))+'</span><button data-act="pRen" data-id="'+p.id+'" aria-label="umbenennen">✎</button>'+(p.start?'<button data-act="pDel" data-id="'+p.id+'" aria-label="löschen">✕</button>':'')+'</div>').join('')+'</div>';
+ if(!S.np)h+='<div style="margin-top:10px">'+ps.slice().reverse().map(p=>{const i=ps.indexOf(p);
+  if(S.pe&&S.pe.id===p.id)return '<div style="border-top:1px solid var(--line2);padding-top:10px"><label class="row">Name <input type="text" data-bind="pename" value="'+esc(S.pe.name)+'"></label><label class="row">Beginn <input type="date" data-bind="pestart" value="'+S.pe.start+'"></label><div class="btnrow"><button class="btn sm" data-act="peCancel">Abbrechen</button><button class="btn sm go" data-act="peSave">Speichern</button></div></div>';
+  return '<div class="srow" style="border-top:1px solid var(--line2);padding-top:6px"><span style="flex:1">'+esc(pLabel(c,p.id))+'</span><button data-act="pEdit" data-id="'+p.id+'" aria-label="bearbeiten">✎</button>'+(i>0?'<button data-act="pDel" data-id="'+p.id+'" aria-label="löschen">✕</button>':'')+'</div>';}).join('')+'</div>';
  h+='</div>';
  h+='<h2>Erfasste Stunden ('+c.lessons.length+')</h2>';
  if(!c.lessons.length)h+='<p class="muted">Noch keine Stunde erfasst.</p>';
@@ -282,7 +291,7 @@ function vEdit(){
  let h=hdr(e.id?'Klasse bearbeiten':'Neue Klasse',e.id?'openClassCur':'home');
  h+='<label class="row">Name <input type="text" data-bind="ename" value="'+esc(e.name)+'" placeholder="z. B. 8b Englisch"></label>';
  h+='<div class="seg" style="margin:10px 0">'+['ma','en'].map(s=>'<button class="'+(e.subject===s?'on':'')+'" data-act="esub" data-v="'+s+'">'+RASTER[s].name+'</button>').join('')+'</div>';
- h+='<h2>Kürzel</h2><p class="muted">Keine vollständigen Namen verwenden. Leere Felder werden ignoriert. </p>';
+ h+='<h2>Kürzel</h2><p class="muted">Nur Nummern aus dem Klassenbuch oder Kürzel (z. B. 2+2 Buchstaben) eintragen, keine vollständigen Namen. Leere Felder werden ignoriert.</p>';
  const act=e.students.filter(s=>s.active!==false);
  h+=act.map((s,i)=>'<div class="srow"><span class="nr">'+(i+1)+'</span><button class="gbtn" data-act="sg" data-id="'+s.id+'" aria-label="Symbol wechseln">'+(SYM[s.g]||'<span class="muted">–</span>')+'</button><input type="text" data-bind="scode" data-id="'+s.id+'" value="'+esc(s.code)+'" autocapitalize="characters" autocomplete="off"><button data-act="sdel" data-id="'+s.id+'" aria-label="entfernen">✕</button></div>').join('');
  h+='<div class="btnrow"><button class="btn sm" data-act="sadd">+ Feld</button><button class="btn sm" data-act="snum">Leere Felder mit Nummern füllen</button></div>';
@@ -294,7 +303,10 @@ function vEdit(){
 }
 
 /* ---------- Wizard ---------- */
-function stepsFor(c){const s=['abs','viel','wenig','qual'];s.push(c.subject==='ma'?'komm':'lang');s.push('abg','ha','notiz','fertig');return s;}
+function stepsFor(c){return['abs','ha','viel','wenig','qual',c.subject==='ma'?'komm':'lang','abg','notiz','fertig'];}
+const STEPNAME={abs:'Anwesend',ha:'Hausaufgaben',viel:'Viel gemeldet',wenig:'Bisschen gemeldet',qual:'Qualität',komm:'Kommunikative Kompetenzen',lang:'Einsprachigkeit',abg:'Abgelenkt',notiz:'Notizen',fertig:'Zusammenfassung'};
+// Entwurf: wird bei jeder Änderung lokal gespeichert, damit man später weitermachen kann
+function wPersist(){if(!S.w)return;const c=cls(S.w.cid);if(!c)return;const d=JSON.parse(JSON.stringify(S.w));d.noteSel=null;c.draft=d;save();}
 function startWizard(c,l){
  const ids=new Set(l?[...l.present,...(l.absent||[])]:activeS(c).map(s=>s.id));
  const roster=c.students.filter(s=>ids.has(s.id)).map((s,i)=>({s,i})).sort((a,b)=>(GORD[a.s.g||'']-GORD[b.s.g||''])||a.i-b.i).map(x=>x.s.id);
@@ -336,7 +348,7 @@ function vWizard(){
     (c.subject==='ma'?'<dt>Kommunikative Kompetenzen</dt><dd>'+codes(c,present.filter(id=>w.komm[id]))+'</dd>':'<dt>Auffällig nicht einsprachig</dt><dd>'+codes(c,present.filter(id=>w.nonEn[id]))+'</dd>')+
     '<dt>Abgelenkt/gestört</dt><dd>'+codes(c,present.filter(id=>w.dist[id]))+'</dd><dt>Keine Hausaufgaben</dt><dd>'+(w.haSkip?'nicht kontrolliert':codes(c,present.filter(id=>w.noHA[id])))+'</dd><dt>Notizen</dt><dd>'+(present.filter(id=>w.notes[id]&&w.notes[id].trim()).length||'–')+'</dd></dl>';break;}
  }
- let h='<div class="prog"><i style="width:'+((w.step+1)/steps.length*100)+'%"></i></div><small>'+esc(c.name)+(w.lid?' · Stunde bearbeiten':'')+'</small><div class="wtitle">'+t+'</div>'+(sub?'<p class="wsub">'+sub+'</p>':'')+b;
+ let h='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px"><small style="flex:1">'+esc(c.name)+' · '+fmtDate(w.date)+(w.lid?' · Stunde bearbeiten':'')+'</small><button class="btn sm" data-act="wPause">Zwischenspeichern</button></div><div class="prog"><i style="width:'+((w.step+1)/steps.length*100)+'%"></i></div><div class="wtitle">'+t+'</div>'+(sub?'<p class="wsub">'+sub+'</p>':'')+b;
  h+='<div class="wnav"><button class="btn" data-act="wBack">'+(w.step?'‹ Zurück':'Abbrechen')+'</button><span class="cnt">'+(w.step+1)+'/'+steps.length+'</span>'+(st==='fertig'?'<button class="btn go" data-act="wSave">Speichern</button>':'<button class="btn primary" data-act="wNext">Weiter ›</button>')+'</div>';
  return h;
 }
@@ -350,7 +362,7 @@ function wSave(){
   const n=(w.notes[id]||'').trim();if(n)l.notes[id]=n;});
  if(w.lid){const i=c.lessons.findIndex(x=>x.id===w.lid);c.lessons[i]=l;}else c.lessons.push(l);
  c.lessons.sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0);
- if(save()){S.w=null;go('class',{cid:c.id});toast('Stunde gespeichert');}
+ delete c.draft;if(save()){S.w=null;go('class',{cid:c.id});toast('Stunde gespeichert');}
 }
 
 /* ---------- Auswertung View ---------- */
@@ -403,7 +415,7 @@ function doCSV(){
 /* ---------- Aktionen ---------- */
 const A={
  home:()=>go('home'),
- openClass:d=>go('class',{cid:d.id,np:null}),
+ openClass:d=>go('class',{cid:d.id,np:null,pe:null}),
  openClassCur:()=>{S.edit=null;go(S.cid&&cls(S.cid)?'class':'home');},
  newClass:()=>{S.edit={id:null,name:'',subject:'ma',students:Array.from({length:30},()=>({id:uid(),code:'',active:true,_new:true}))};go('edit');},
  editClass:()=>{const c=cls(S.cid);S.edit={id:c.id,name:c.name,subject:c.subject,students:c.students.map(s=>({...s}))};go('edit');},
@@ -422,7 +434,7 @@ const A={
   const dup=act.find((x,i)=>act.indexOf(x)!==i);if(dup){toast('Kürzel doppelt: '+dup,true);return;}
   const studs=e.students.map(({_new,...s})=>s);
   if(old){old.name=e.name.trim()||old.name;old.subject=e.subject;old.students=studs;}
-  else{e.id=uid();db.classes.push({id:e.id,name:e.name.trim()||'Neue Klasse',subject:e.subject,students:studs,lessons:[]});}
+  else{e.id=uid();db.classes.push({id:e.id,name:e.name.trim()||'Neue Klasse',subject:e.subject,students:studs,lessons:[],periods:[{id:uid(),name:'Zeitraum 1',start:today()}]});}
   if(save()){S.cid=e.id;S.edit=null;go('class');toast('Gespeichert');}},
  cdel:()=>{const c=cls(S.edit.id);if(!confirm('Klasse „'+c.name+'“ mit '+c.lessons.length+' Stunden endgültig löschen?'))return;db.classes=db.classes.filter(x=>x!==c);save();S.edit=null;go('home');},
  startW:()=>startWizard(cls(S.cid)),
@@ -441,7 +453,11 @@ const A={
  seg:d=>{S.w[d.f][d.id]=+d.v;render();},
  haSkip:()=>{S.w.haSkip=!S.w.haSkip;render();},
  wNext:()=>{const w=S.w;if(!w.date){toast('Bitte Datum wählen',true);return;}w.step++;w.noteSel=null;render();window.scrollTo(0,0);},
- wBack:()=>{const w=S.w;if(w.step){w.step--;render();window.scrollTo(0,0);}else if(confirm('Erfassung abbrechen? Eingaben gehen verloren.')){S.w=null;go('class');}},
+ wBack:()=>{const w=S.w;if(w.step){w.step--;render();window.scrollTo(0,0);}else if(confirm('Erfassung abbrechen? Eingaben gehen verloren.')){const c=cls(w.cid);delete c.draft;save();S.w=null;go('class');}},
+ wPause:()=>{wPersist();const id=S.w.cid;S.w=null;go('class',{cid:id});toast('Zwischengespeichert – in der Klasse auf „Fortsetzen“ tippen');},
+ wJump:d=>{S.w.step=+d.i;S.w.noteSel=null;render();window.scrollTo(0,0);},
+ resumeW:()=>{const c=cls(S.cid);S.w=JSON.parse(JSON.stringify(c.draft));go('wizard');},
+ dropDraft:()=>{const c=cls(S.cid);if(!confirm('Angefangene Stunde vom '+fmtDate(c.draft.date)+' verwerfen?'))return;delete c.draft;save();render();},
  wSave:()=>wSave(),
  toEval:()=>{S.pid=curPeriod(cls(S.cid)).id;go('eval');},
  pSel:d=>{S.pid=d.id;render();},
@@ -453,7 +469,14 @@ const A={
   if(!c.periods||!c.periods.length)c.periods=[{id:uid(),name:'Zeitraum 1',start:''}];
   c.periods.push({id:uid(),name:np.name.trim()||('Zeitraum '+(ps.length+1)),start:np.start});
   S.np=null;if(save())toast('Neuer Zeitraum gestartet');render();},
- pRen:d=>{const c=cls(S.cid);if(!c.periods||!c.periods.length)c.periods=[{id:uid(),name:'Zeitraum 1',start:''}];const p=c.periods.find(x=>x.id===d.id)||c.periods[0];const n=prompt('Neuer Name:',p.name);if(n&&n.trim()){p.name=n.trim();save();render();}},
+ pEdit:d=>{const c=cls(S.cid);if(!c.periods||!c.periods.length)c.periods=[{id:'_p1',name:'Zeitraum 1',start:''}];const p=c.periods.find(x=>x.id===d.id)||c.periods[0];
+  let st=p.start;if(!st&&periods(c)[0]===p){const f=c.lessons[0];st=f?f.date:today();}S.pe={id:p.id,name:p.name,start:st};render();},
+ peCancel:()=>{S.pe=null;render();},
+ peSave:()=>{const c=cls(S.cid),ps=periods(c),i=ps.findIndex(x=>x.id===S.pe.id),p=ps[i];
+  if(!S.pe.start){toast('Bitte Beginn wählen',true);return;}
+  if(i>0&&ps[i-1].start&&S.pe.start<=ps[i-1].start){toast('Beginn muss nach dem Beginn des vorherigen Zeitraums liegen',true);return;}
+  if(ps[i+1]&&S.pe.start>=ps[i+1].start){toast('Beginn muss vor dem Beginn des nächsten Zeitraums liegen',true);return;}
+  p.name=S.pe.name.trim()||p.name;p.start=S.pe.start;S.pe=null;if(save())toast('Gespeichert');render();},
  pDel:d=>{const c=cls(S.cid),p=c.periods.find(x=>x.id===d.id);if(!confirm('Zeitraum „'+p.name+'“ entfernen?\nEs werden KEINE Stunden gelöscht – sie zählen dann zum vorherigen Zeitraum.'))return;c.periods=c.periods.filter(x=>x!==p);save();render();},
  openStu:d=>go('stu',{sid:d.id}),
  csv:()=>doCSV(),
@@ -463,9 +486,11 @@ const A={
 const BIND={
  ename:t=>S.edit.name=t.value,
  scode:t=>{S.edit.students.find(s=>s.id===t.dataset.id).code=t.value;},
- wdate:t=>S.w.date=t.value,
- note:t=>{S.w.notes[S.w.noteSel]=t.value;},
+ wdate:t=>{S.w.date=t.value;wPersist();},
+ note:t=>{S.w.notes[S.w.noteSel]=t.value;wPersist();},
  npname:t=>{S.np.name=t.value;},
+ pename:t=>{S.pe.name=t.value;},
+ pestart:t=>{S.pe.start=t.value;},
  npdate:t=>{S.np.start=t.value;}
 };
 app.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const f=A[b.dataset.act];if(f)f(b.dataset,b,e);});
@@ -478,6 +503,7 @@ function render(){
  const sc=S.view==='edit'&&S.edit?S.edit.subject:S.view==='wizard'&&S.w?(cls(S.w.cid)||{}).subject:['class','eval','stu'].includes(S.view)?(cls(S.cid)||{}).subject:'';
  document.body.dataset.subj=sc||'';
  const h=v();if(typeof h==='string')app.innerHTML=h;
+ if(S.view==='wizard'&&S.w)wPersist();
 }
 render();
 if('serviceWorker' in navigator&&location.protocol==='https:'){navigator.serviceWorker.register('sw.js').catch(()=>{});}
